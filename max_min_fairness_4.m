@@ -1,15 +1,14 @@
 clc
-close all
+% close all
 %% parameters
 N1=2;                           % No.  users
-N_i=10;                         % No.  IRS elements
-N_iter=100;                     % No. iteraions
+N_i=2;                         % No.  IRS elements
+N_iter=1;                     % No. iteraions
 P_T=(10^(40/10))*1e-3;               % BS power(w)
 R=3;                           % Radius
 [x0,y0,z0]=deal(10,10,0);         % user area center
-[x1,y1,z1]=deal(0,0,0);       % BS1 location
-[x2,y2,z2]=deal(0.5*100,0,0);   % BS2 location
-[x_i,y_i,z_i]=deal(50,30,10);   % IRS location
+[x1,y1,z1]=deal(0,0,10);       % BS1 location
+[x_i,y_i,z_i]=deal(25*sqrt(2),25*sqrt(2),10);   % IRS location
 M_t=1;                          % No. of transmitter antennas
 M_r=1;                          % No. of receiver antennas
 % d_IB=100;
@@ -24,10 +23,10 @@ t=2*pi*rand(N1,1);
 r = R*sqrt(rand(N1,1));
 x = x0 + r.*cos(t);
 y = y0 + r.*sin(t);
-x(1)=32.52;y(1)=23.48;
+% x(1)=32.52;y(1)=23.48;
 x(1)=100;y(1)=5;
-x(2)=2;y(2)=22;
-% x(2)=40;y(2)=30;
+x(2)=48.45;y(2)=19.55;
+x(2)=0;y(2)=20;
 z=1.5*ones(N1,1);
 % y(1)=y(1)-15;
 % x(1)=x(1)-20;
@@ -37,7 +36,7 @@ step=2;
 final_rate=zeros(floor(N_i/step)+1,1);
 random_final_rate=zeros(floor(N_i/step)+1,1);
 tic
-for N=N_i:step:N_i
+for N=step:step:N_i
     m=repmat('.', 1, N_i);
 
     for i=1:N
@@ -65,8 +64,13 @@ for N=N_i:step:N_i
         Q=10^13*Q;
         cvx_begin sdp
             variable X(N+1,N+1) complex hermitian  ;
-            maximize min(10^13*abs(h_d(1))^2+real(trace(Q(:,:,1)*X)),10^13*abs(h_d(2))^2+real(trace(Q(:,:,2)*X)))      %% trace(A4*X) is Real if X and A4 is hemitian matrix
+            variable s(1,1)     complex hermitian  ;
+            maximize s
+%             min(10^13*abs(h_d(1))^2+real(trace(Q(:,:,1)*X)),10^13*abs(h_d(2))^2+real(trace(Q(:,:,2)*X)))      %% trace(A4*X) is Real if X and A4 is hemitian matrix
             subject to 
+            for m=1:N1
+                10^13*abs(h_d(m))^2+real(trace(Q(:,:,m)*X))>=s
+            end
             diag(X) == 1;
             X==hermitian_semidefinite(N+1);
         cvx_end
@@ -75,11 +79,6 @@ for N=N_i:step:N_i
         %% channel gains
         channel_gain(1)=abs(h_d(1)+h_r(:,1)'*diag(Z_cvx)*g);
         channel_gain(2)=abs(h_d(2)+h_r(:,2)'*diag(Z_cvx)*g);
-%         channel_gain(1)=sqrt(abs(h_d(1))^2+real(trace(Q(:,:,1)*X)));
-%         channel_gain(2)=sqrt(abs(h_d(2))^2+real(trace(Q(:,:,2)*X)));
-
-        rate_lower_bound=(1/N1)*(log2(1+min(channel_gain.^2)*P_T/noise_power));
-
         channel_gain=sort(abs(channel_gain));
         p = 10^12*[P_T*abs(channel_gain(1)*channel_gain(2))^2, noise_power*(channel_gain'*channel_gain), -noise_power*abs(channel_gain(1))^2];
         r = roots(p);
@@ -104,9 +103,7 @@ for N=N_i:step:N_i
         rate_lower_bound=(1/N1)*(log2((abs(channel_gain(1))^2*P_T+noise_power)/(abs(channel_gain(1))^2*P_T*alpha+noise_power))+log2((abs(channel_gain(2))^2*alpha*P_T+noise_power)/noise_power));
         random_final_rate(floor(N/step)+1)=random_final_rate(floor(N/step)+1)+rate_lower_bound;
     
-        
     end
-  
 end
 final_rate=final_rate/N_iter;
 random_final_rate=random_final_rate/N_iter;

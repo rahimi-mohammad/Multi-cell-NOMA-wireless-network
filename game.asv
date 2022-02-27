@@ -100,11 +100,11 @@ close all
                                 (1 - P( 1, d) ) * P( 2, d) * u( 2, 1, :, d) + ...
                                 ( 1 - P( 1, d) ) * (1 - P( 2, d) ) * u( 2, 2, :, d); 
     %% Random Resource allocation for IRS 
-        Random_final_rate(1, d)=0.5*(rate(1,2,1, d)+rate(2,1,1, d));
-        Random_final_rate(2, d)=0.5*(rate(2,1,2, d)+rate(1,2,2, d));
+        Random_final_rate(1, d)=0.5*(rate(1,2,1)+rate(2,1,1));
+        Random_final_rate(2,d)=0.5*(rate(2,1,2)+rate(1,2,2));
     
-        Random_final_utility(1, d)=0.5*(u(1,2,1, d)+u(2,1,1, d));
-        Random_final_utility(2, d)=0.5*(u(2,1,2, d)+u(1,2,2, d));
+        Random_final_utility(1,d)=0.5*(u(1,2,1)+u(2,1,1));
+        Random_final_utility(2,d)=0.5*(u(2,1,2)+u(1,2,2));
 
     end
     %% plot
@@ -147,7 +147,7 @@ close all
     grid on
     xlabel('y')
     ylabel('Sum Rate')
-    xlim([11 20]);
+    xlim([0 10]);
     ylim([0 12]);
     legend('BS1 NE-SUM RATE','BS1 RANDOM-SUM RATE'...
         ,'BS2 NE-SUM RATE','BS2 RANDOM-SUM RATE');

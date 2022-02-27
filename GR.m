@@ -1,8 +1,7 @@
 function y=GR(Z)
     N_r=100;
     N=size(Z,1)-1;
-    [U,S,V]=svd(conj(Z));
-%     z_hat=sqrt(S(1,1)*U(:,1,1)) ;
+    [~,S,V]=svd(conj(Z));
     V_prime=V*sqrt(S);
     z_hat=zeros(N+1,1);
     for i=1:N_r
