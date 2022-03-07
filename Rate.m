@@ -1,7 +1,7 @@
 % ------------------------------------------------------------------------ 
 %  mrahimi7755 - Sharif University of Technology, Iran
 % ------------------------------------------------------------------------
-% Utility.m - This method calculates utility function of the BS for each
+% Rate.m - This method calculates aceivable rate of the BS's users for each
 % strategy
 % Inputs:
 %     s                  - Scenario: s=0 without IRS and s=1 with RIS,
@@ -16,24 +16,21 @@
     % noise_power        - Noise power
     % N_iter             - No. iteraions
 % Outputs:
-    % U                  - Utility function 
+    % U                  - Acheivable Rate of the BS.
 % ------------------------------------------------------------------------
-function u=Utility(s, M_t, M_r, N1, N_i, P_T, x, y, z, x1, y1, z1,...
+function rate=Rate(s, M_t, M_r, N1, N_i, P_T, x, y, z, x1, y1, z1,...
                     x_i, y_i, z_i, alpha_d, alpha_r, noise_power, N_iter)
     %% parameters
     channel_gain=zeros(N1,1);
     final_rate=0;
     N=N_i;
-        m=repmat('.', 1, 11);
     switch s
         case{0} % without IRS
             for k=1:N_iter
-                m(1+floor(10*k/N_iter))='|';
-                disp(m)
                 %% channel gains
 %                 h_d=(10^0.2)*(randn(N1,M_t,M_r)+1j*randn(N1,M_t,M_r))*sqrt(1/2).*((10^0.2)./(sqrt( (x-x1).^2+(y-y1).^2+(z-z1).^2 )).^alpha_d);
                 [h_d, ~, ~]=ChannelGain(M_t, M_r, N1, N, x, y, z, x1, y1, z1,...
-                                            x_i, y_i, z_i, alpha_d, alpha_r);               
+                                        x_i, y_i, z_i, alpha_d, alpha_r);               
                 if M_t==1
                     %% without IRS
                     h_d=sort(abs(h_d));
@@ -51,8 +48,6 @@ function u=Utility(s, M_t, M_r, N1, N_i, P_T, x, y, z, x1, y1, z1,...
             
             if M_t==1
                 for k=1:N_iter
-                    m(1+floor(10*k/N_iter))='|';
-                    disp(m)
                     %% channel gains
     %                 h_d=(10^0.2)*(randn(N1,M_t,M_r)+1j*randn(N1,M_t,M_r))*sqrt(1/2).*((10^0.2)./(sqrt( (x-x1).^2+(y-y1).^2+(z-z1).^2 )).^alpha_d);
     %                 g=(10^0.2)*(randn(N,M_t,M_r)+1j*randn(N,M_t,M_r))*sqrt(1/2).*((10^0.2)./(sqrt( (x_i-x1).^2+(y_i-y1).^2+(z_i-z1).^2 )).^alpha_r);
@@ -93,25 +88,22 @@ function u=Utility(s, M_t, M_r, N1, N_i, P_T, x, y, z, x1, y1, z1,...
                 end
                     final_rate=final_rate/N_iter;
             elseif M_t>1
-                 for k=1:N_iter
-                    m(1+floor(10*k/N_iter))='|';
-                    disp(m)
-
-                    %% channel gains
-                    [h_d, G, h_r]=ChannelGain(M_t, M_r, N1, N, x, y, z, x1, y1, z1,...
-                                x_i, y_i, z_i, alpha_d, alpha_r);
-                    %% problem coefficients
-                    phi=zeros(N,N1);
-                    Q=zeros(N+1,N+1,N1);
-                    for i=1:N1
-                        phi(:,i)=diag(h_r(:,i)')*g;
-                        Q(:,:,i)=[phi(:,i)*transpose(conj(phi(:,i))) conj(h_d(i))*phi(:,i);h_d(i)*transpose(conj(phi(:,i))) 0];
-                    end
-                    
-                    
-                 end
+%                  for k=1:N_iter
+%                     %% channel gains
+%                     [h_d, G, h_r]=ChannelGain(M_t, M_r, N1, N, x, y, z, x1, y1, z1,...
+%                                 x_i, y_i, z_i, alpha_d, alpha_r);
+%                     %% problem coefficients
+%                     phi=zeros(N,N1);
+%                     Q=zeros(N+1,N+1,N1);
+%                     for i=1:N1
+%                         phi(:,i)=diag(h_r(:,i)')*g;
+%                         Q(:,:,i)=[phi(:,i)*transpose(conj(phi(:,i))) conj(h_d(i))*phi(:,i);h_d(i)*transpose(conj(phi(:,i))) 0];
+%                     end
+%                     
+%                     
+%                  end
                 
             end
     end
-    u=final_rate;
+    rate=final_rate;
 end
