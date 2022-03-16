@@ -13,14 +13,14 @@
 %-------------------------------------------------------------------------
 
 clc
-% close all
+close all
 tic
 %% parameters
     N1=2;                                % No.  users
     N2=N1;
     R1=4;                                % BS1 user area center radius
     R2=10;                                % BS2 user area center radius    
-    N_i=10;                              % No.  IRS elements
+    N_i=20;                              % No.  IRS elements
     P_T=(10^(40/10))*1e-3;               % BS power
     [x0,y0,z0]=deal(50,20,0);            % user area center
     [x1,y1,z1]=deal(0,0,0);              % BS1 location
@@ -35,7 +35,7 @@ tic
     noise_power=(10^(-114/10));     % -169dbm/Hz
     epsilon=1e-7;
     r=0.23;
-    N_iter=200;
+    N_iter=1;
     %% users location
     t=2*pi*rand(N1,1);
     radius = 1*sqrt(rand(N1,1));
@@ -51,7 +51,6 @@ tic
     x(4)=80;y(4)=10;
     x(3)=55;y(3)=10;
     x(4)=55;y(4)=10;
-    
     z=1.5*ones(2*N1,1);
     
 %%
@@ -112,10 +111,11 @@ toc
     plot((x(1)+x(2))/2,d,'o-','MarkerSize',30,'linewidth',0.1)
     plot((x(1)+x(2))/2,start,'o-','MarkerSize',30,'linewidth',0.1)
     plot((x(1)+x(2))/2,d,'o-','MarkerSize',30,'linewidth',0.1)
+    
 %     plot(x(1),y(1),'ro','linewidth',1)
 %     plot(x(2),y(2),'bo','linewidth',1)
-    plot(x(3),y(3),'ro','linewidth',1)
-    plot(x(4),y(4),'bo','linewidth',1)
+%     plot(x(3),y(3),'ro','linewidth',1)
+%     plot(x(4),y(4),'bo','linewidth',1)
     plot(x_i,y_i,'gs','MarkerSize',30,'linewidth',1)
     title('User Location')
     xlabel('x')
@@ -131,13 +131,14 @@ toc
     plot(start:step:y_i,NE_final_rate(2,1:i),'r-*','linewidth',1)
     plot(start:step:y_i,Random_final_rate(2,1:i),'r','linewidth',1)
     grid on
+    title(['N=',num2str(N_i)])
     xlabel('y')
     ylabel('Sum Rate')
     xlim([start d]);
     ylim([0 15]);
     legend('BS1 NE','BS1 RANDOM'...
         ,'BS2 NE','BS2 RANDOM');
-    saveas(gcf,'sumrate.jpg')
+    saveas(gcf,['rate for ', num2str(N_i),' elements.jpg'])
 %% plot
 figure
     tiledlayout(1,2)
@@ -152,10 +153,12 @@ figure
         'MarkerFaceColor','r','linewidth',1)
     plot((x(1)+x(2))/2,start,'o-','MarkerSize',30,'linewidth',0.1)
     plot((x(1)+x(2))/2,d,'o-','MarkerSize',30,'linewidth',0.1)
+    plot((x(1)+x(2))/2,start,'o-','MarkerSize',30,'linewidth',0.1)
+    plot((x(1)+x(2))/2,d,'o-','MarkerSize',30,'linewidth',0.1)
 %     plot(x(1),y(1),'ro','linewidth',1)
 %     plot(x(2),y(2),'bo','linewidth',1)
-    plot(x(3),y(3),'ro','linewidth',1)
-    plot(x(4),y(4),'bo','linewidth',1)
+    plot((x(3)+x(4))/2,start,'o-','MarkerSize',30,'linewidth',0.1)
+%     plot(x(4),y(4),'bo','linewidth',1)
     plot(x_i,y_i,'gs','MarkerSize',30,'linewidth',1)
     title('User Location')
     xlabel('x')
@@ -173,16 +176,15 @@ figure
         'MarkerFaceColor','b',...
         'linewidth',1)
     plot(start:step:y_i,NE_final_utility(2,1:i),'r-*',...
-                'MarkerSize',4,...
                 'linewidth',1)
     plot(start:step:y_i,Random_final_utility(2,1:i),'r','linewidth',1)
     grid on
+    title(['N=',num2str(N_i)])
     xlabel('y')
     ylabel('Utility')
     xlim([start d]);
     ylim([0 15]);
     legend('BS1 NE','BS1 RANDOM'...
         ,'BS2 NE','BS2 RANDOM');
-    saveas(gcf,'utility.jpg')
-    
+    saveas(gcf,['utility for ', num2str(N_i),' elements.jpg'])
     
