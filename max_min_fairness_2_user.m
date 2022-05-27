@@ -1,8 +1,8 @@
 clc
-% close all
+close all
 %% parameters
 N1=2;                           % No.  users
-N_i=10;                         % No.  IRS elements
+N_i=2;                         % No.  IRS elements
 N_iter=1;                     % No. iteraions
 P_T=(10^(40/10))*1e-3;               % BS power(w)
 R=3;                           % Radius

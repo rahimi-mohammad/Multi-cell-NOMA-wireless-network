@@ -1,9 +1,9 @@
 clc
-% close all
+close all
 %% parameters
-N1=2;                           % No.  users
-N_i=2;                         % No.  IRS elements
-N_iter=1;                     % No. iteraions
+N1=5;                           % No.  users
+N_i=10;                         % No.  IRS elements
+N_iter=100;                     % No. iteraions
 P_T=(10^(40/10))*1e-3;               % BS power(w)
 R=3;                           % Radius
 [x0,y0,z0]=deal(10,10,0);         % user area center
@@ -11,13 +11,9 @@ R=3;                           % Radius
 [x_i,y_i,z_i]=deal(25*sqrt(2),25*sqrt(2),10);   % IRS location
 M_t=1;                          % No. of transmitter antennas
 M_r=1;                          % No. of receiver antennas
-% d_IB=100;
 alpha_d=3.6;
 alpha_r=2;
-% gama=100*[1 1 1 1 1 1 1 1];     % minimum SNR
-% BW=10e7;
 noise_power=(10^(-114/10));     % -169dbm/Hz
-% epsilon=1e-7;
 %% users location
 t=2*pi*rand(N1,1);
 r = R*sqrt(rand(N1,1));
@@ -32,11 +28,12 @@ z=1.5*ones(N1,1);
 % x(1)=x(1)-20;
 %% 
 channel_gain=zeros(N1,1);
+start=2;
 step=2;
 final_rate=zeros(floor(N_i/step)+1,1);
 random_final_rate=zeros(floor(N_i/step)+1,1);
 tic
-for N=step:step:N_i
+for N=start:step:N_i
     m=repmat('.', 1, N_i);
 
     for i=1:N
@@ -61,12 +58,14 @@ for N=step:step:N_i
         end
 
         %% problem solver
+        
+        
         Q=10^13*Q;
         cvx_begin sdp
             variable X(N+1,N+1) complex hermitian  ;
             variable s(1,1)     complex hermitian  ;
             maximize s
-%             min(10^13*abs(h_d(1))^2+real(trace(Q(:,:,1)*X)),10^13*abs(h_d(2))^2+real(trace(Q(:,:,2)*X)))      %% trace(A4*X) is Real if X and A4 is hemitian matrix
+%             min(10^13*abs(h_d(1))^2+real(trace(Q(:,:,1)*X)),10^1e3*abs(h_d(2))^2+real(trace(Q(:,:,2)*X)))      %% trace(A4*X) is Real if X and A4 is hemitian matrix
             subject to 
             for m=1:N1
                 10^13*abs(h_d(m))^2+real(trace(Q(:,:,m)*X))>=s
@@ -74,33 +73,41 @@ for N=step:step:N_i
             diag(X) == 1;
             X==hermitian_semidefinite(N+1);
         cvx_end
+
+
         Z_cvx=GR(X);
         Q=10^(-13)*Q;
         %% channel gains
-        channel_gain(1)=abs(h_d(1)+h_r(:,1)'*diag(Z_cvx)*g);
-        channel_gain(2)=abs(h_d(2)+h_r(:,2)'*diag(Z_cvx)*g);
-        channel_gain=sort(abs(channel_gain));
-        p = 10^12*[P_T*abs(channel_gain(1)*channel_gain(2))^2, noise_power*(channel_gain'*channel_gain), -noise_power*abs(channel_gain(1))^2];
-        r = roots(p);
-        alpha=r(0<r&r<1); 
-        rate_lower_bound=(1/N1)*(log2((abs(channel_gain(1))^2*P_T+noise_power)/(abs(channel_gain(1))^2*P_T*alpha+noise_power))+log2((abs(channel_gain(2))^2*alpha*P_T+noise_power)/noise_power));
+%         for j=1:N1
+%             channel_gain(1)=abs(h_d(1)+h_r(:,1)'*diag(Z_cvx)*g);
+%             channel_gain(2)=abs(h_d(2)+h_r(:,2)'*diag(Z_cvx)*g);
+        channel_gain=sort(abs(h_d+h_r'*diag(Z_cvx)*g));
+%         p = 10^12*[P_T*abs(channel_gain(1)*channel_gain(2))^2, noise_power*(channel_gain'*channel_gain), -noise_power*abs(channel_gain(1))^2];
+%         r = roots(p);
+%         alpha=r(0<r&r<1); 
+%         rate_lower_bound=(1/N1)*(log2((abs(channel_gain(1))^2*P_T+noise_power)/(abs(channel_gain(1))^2*P_T*alpha+noise_power))+log2((abs(channel_gain(2))^2*alpha*P_T+noise_power)/noise_power))
+        rate_lower_bound=log2(1+P_T*channel_gain(1)^2/noise_power)/N1;
+%         rate_lower_bound=(1/N1)*(log2(1+min(channel_gain.^2)*P_T/noise_power))
+
         final_rate(floor(N/step)+1)=final_rate(floor(N/step)+1)+rate_lower_bound;
                 
         %% without IRS
         h_d=sort(abs(h_d));
-        p = 10^10*[P_T*abs(h_d(1)*h_d(2))^2, noise_power*(h_d'*h_d), -noise_power*abs(h_d(1))^2];
-        r = roots(p);
-        alpha=r(0<r&r<1); 
-        final_rate(1)=(1/N1)*(log2((abs(h_d(1))^2*P_T+noise_power)/(abs(h_d(1))^2*P_T*alpha+noise_power))+log2((abs(h_d(2))^2*alpha*P_T+noise_power)/noise_power))+final_rate(1);         
+%         p = 10^10*[P_T*abs(h_d(1)*h_d(2))^2, noise_power*(h_d'*h_d), -noise_power*abs(h_d(1))^2];
+%         r = roots(p);
+%         alpha=r(0<r&r<1); 
+
+        final_rate(1)=log2(1+P_T*h_d(1)^2/noise_power)/N1+final_rate(1);         
         %% random theta
         rand_theta=exp(1j*2*pi*rand(N,1));
-        channel_gain(1)=abs(h_d(1)+h_r(:,1)'*diag(rand_theta)*g);
-        channel_gain(2)=abs(h_d(2)+h_r(:,2)'*diag(rand_theta)*g);
+        channel_gain=abs(h_d+h_r'*diag(rand_theta)*g);
         channel_gain=sort(abs(channel_gain));
-        p = 10^2*[P_T*abs(channel_gain(1)*channel_gain(2))^2, noise_power*(channel_gain'*channel_gain), -noise_power*abs(channel_gain(1))^2];
-        r = roots(p);
-        alpha=r(0<r&r<1); 
-        rate_lower_bound=(1/N1)*(log2((abs(channel_gain(1))^2*P_T+noise_power)/(abs(channel_gain(1))^2*P_T*alpha+noise_power))+log2((abs(channel_gain(2))^2*alpha*P_T+noise_power)/noise_power));
+%         p = 10^2*[P_T*abs(channel_gain(1)*channel_gain(2))^2, noise_power*(channel_gain'*channel_gain), -noise_power*abs(channel_gain(1))^2];
+%         r = roots(p);
+%         alpha=r(0<r&r<1); 
+%         rate_lower_bound=(1/N1)*(log2((abs(channel_gain(1))^2*P_T+noise_power)/(abs(channel_gain(1))^2*P_T*alpha+noise_power))+log2((abs(channel_gain(2))^2*alpha*P_T+noise_power)/noise_power));
+        rate_lower_bound=log2(1+P_T*channel_gain(1)^2/noise_power)/N1;
+
         random_final_rate(floor(N/step)+1)=random_final_rate(floor(N/step)+1)+rate_lower_bound;
     
     end
