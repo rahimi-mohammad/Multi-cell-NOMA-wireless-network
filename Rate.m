@@ -93,13 +93,13 @@ function rate=Rate(s, M_t, M_r, N1, N_i, P_T, x, y, z, x1, y1, z1,...
                     final_rate=final_rate/N_iter;
             elseif M_t>1
                 % I will write this later
-                    [h_d, g, h_r]=ChannelGain(M_t, M_r, N1, N, x, y, z, x1, y1, z1,...
+                    [h_d, G, h_r]=ChannelGain(M_t, M_r, N1, N, x, y, z, x1, y1, z1,...
                                               x_i, y_i, z_i, alpha_d, alpha_r);
                     %% problem coefficients
                     phi=zeros(N,N1);
                     Q=zeros(N+1,N+1,N1);
                     for i=1:N1
-                        phi(:,i)=diag(h_r(:,i)')*g;
+                        phi(:,i)=diag(h_r(:,i)')*G;
                         Q(:,:,i)=[phi(:,i)*transpose(conj(phi(:,i))) conj(h_d(i))*phi(:,i);h_d(i)*transpose(conj(phi(:,i))) 0];
                     end
             end
