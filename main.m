@@ -13,8 +13,8 @@ R1=10;                                % BS1 user area center radius
 R2=10;                                % BS2 user area center radius    
 N_i=30;                               % No.  IRS elements
 q_t=0.2;                              % Quantization step-size
-N_iter=2;
-SV=10;                                 % Scenario Variable
+N_iter=100;
+SV=2;                                 % Scenario Variable
 P_T=(10^(40/10))*1e-3;                % BS power
 % [x0,y0,z0]=deal(50,20,0);             % user area center
 [x1,y1,z1]=deal(0,0,0);               % BS1 location
@@ -43,9 +43,9 @@ y(N1+1:N2+N1)=10;
 %     rate=zeros(2,2,2,10);
 utility=zeros(ceil(N_i*q_t)+1,ceil(N_i*q_t)+1,2,SV);
 rate=zeros(ceil(N_i*q_t)+1,ceil(N_i*q_t)+1,2,SV);
-var=[];
-save('utility.mat','var')
-save('rate.mat','var')
+% var=[];
+% save('utility.mat','var')
+% save('rate.mat','var')
 P=zeros(2,SV);
 NE_final_rate=zeros(2,SV);
 NE_final_utility=zeros(2,SV);
@@ -61,8 +61,8 @@ for d=start+0*step:step:start+(SV-1)*step
     disp(m)
     pause(1)
     y(1:2)=d;
+    
     i=1+floor((d-start)/step);
-%         s=1;                            % s=1 : with IRS
 %         [utility(:, :, :, i), rate(:, :, :, i)]=game(M_t, M_r, N1, N2, N_i, P_T, x, y, z, x1, y1, z1,...
 %                 x2, y2, z2, x_i, y_i, z_i, alpha_d, alpha_r, noise_power, N_iter, [R1; R2], r);
 %         P(:,i)=NE(utility(:, :, :, i));
@@ -93,12 +93,11 @@ for d=start+0*step:step:start+(SV-1)*step
     SaveOut('rate.mat',rate(:,:,:,i));                                    
     F=sum(utility,3);
     maximum = max(max(F));
-    [x,y]=find(F==maximum);
+    [s1_star,s2_star]=find(F==maximum);
 %     utility(x,y,:,:)
 %% Random Resource allocation for IRS 
     Random_final_rate(1, i)=0.5*(rate(1,2,1, i)+rate(2,1,1, i));
     Random_final_rate(2, i)=0.5*(rate(2,1,2, i)+rate(1,2,2, i));
-
     Random_final_utility(1, i)=0.5*(utility(1,2,1, i)+utility(2,1,1, i));
     Random_final_utility(2, i)=0.5*(utility(2,1,2, i)+utility(1,2,2, i));
 

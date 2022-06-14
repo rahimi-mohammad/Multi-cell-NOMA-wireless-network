@@ -68,7 +68,6 @@ function rate=Rate(s, M_t, M_r, N1, N_i, P_T, x, y, z, x1, y1, z1,...
                         variable X(N+1,N+1) complex hermitian  ;
                         variable s(1,1)     complex hermitian  ;
                         maximize s
-            %             min(10^13*abs(h_d(1))^2+real(trace(Q(:,:,1)*X)),10^1e3*abs(h_d(2))^2+real(trace(Q(:,:,2)*X)))      %% trace(A4*X) is Real if X and A4 is hemitian matrix
                         subject to 
                         for m=1:N1
                             10^13*abs(h_d(m))^2+real(trace(Q(:,:,m)*X))>=s
@@ -79,13 +78,6 @@ function rate=Rate(s, M_t, M_r, N1, N_i, P_T, x, y, z, x1, y1, z1,...
                     Z_cvx=GR(X);
     %                 Q=10^(-13)*Q;
                     %% channel gains
-%                     channel_gain(1)=abs(h_d(1)+h_r(:,1)'*diag(Z_cvx)*g);
-%                     channel_gain(2)=abs(h_d(2)+h_r(:,2)'*diag(Z_cvx)*g);
-%                     channel_gain=sort(abs(channel_gain));
-%                     p = 10^12*[P_T*abs(channel_gain(1)*channel_gain(2))^2, noise_power*(channel_gain'*channel_gain), -noise_power*abs(channel_gain(1))^2];
-%                     r = roots(p);
-%                     alpha=r(0<r&r<1); 
-%                     rate_lower_bound=(1/N1)*(log2((abs(channel_gain(1))^2*P_T+noise_power)/(abs(channel_gain(1))^2*P_T*alpha+noise_power))+log2((abs(channel_gain(2))^2*alpha*P_T+noise_power)/noise_power));
                     channel_gain=sort(abs(h_d+h_r'*diag(Z_cvx)*g));
                     rate_lower_bound=log2(1+P_T*channel_gain(1)^2/noise_power)/N1;
                     final_rate=final_rate+rate_lower_bound;

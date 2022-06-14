@@ -38,8 +38,8 @@
 %
 %
 % Outputs:
-    % utility                  - Utility function, 
-    % rate                     - Average acievable sumrate for each BS.
+    % utility             - Utility function, 
+    % rate                - Average acievable sumrate for each BS.
 % ------------------------------------------------------------------------
 
 
@@ -75,27 +75,10 @@ function [utility, rate]=PotentialGame(M_t, M_r, N1, N2, N_i, P_T, x, y, z, x1, 
                
                 N_i2=floor((s2-1)/q_t);    % No. of elements allocated to BS2
                 rate(s1 , s2, 2) = rate(s1 , s2, 2) + Rate(ceil(N_i2/N_i), M_t, M_r, N2, N_i2, P_T, x(N1+1: N1+N2), y(N1+1: N1+N2), ...
-                                                    z(N1+1: N1+N2), x2, y2, z2, x_i, y_i, z_i, alpha_d, alpha_r, noise_power, 1);               
-                utility(s1 , s2, 1)=utility(s1 , s2, 1)+rate(s1 , s2, 1)-r*N_i1;
-                utility(s1 , s2, 2)=utility(s1 , s2, 2)+rate(s1 , s2, 2)-r*N_i2;           
+                                                    z(N1+1: N1+N2), x2, y2, z2, x_i, y_i, z_i, alpha_d, alpha_r, noise_power, 1);                          
            end            
         end
         
-%         rate(1 , 1, 1) = rate(1, 1, 1) + Rate(s, M_t, M_r, N1, N_i/2, P_T, x(1:N1), y(1:N1), ...
-%                                             z(1:N1), x1, y1, z1, x_i, y_i, z_i, alpha_d, alpha_r, noise_power, 1);
-%         rate(1, 1, 2) = rate(1, 1, 2) + Rate(s, M_t, M_r, N2, N_i/2, P_T, x(N1+1: N1+N2), y(N1+1: N1+N2), ...
-%                                             z(N1+1: N1+N2), x2, y2, z2, x_i, y_i, z_i, alpha_d, alpha_r, noise_power, 1);
-%         rate(1, 2, 1) = rate(1, 2, 1) + Rate(s, M_t, M_r, N1, N_i, P_T, x(1: N1), y(1: N1),...
-%                                             z(1: N1), x1, y1, z1, x_i, y_i, z_i, alpha_d, alpha_r, noise_power, 1);    
-%         rate(2, 1, 2) = rate(1, 2, 1) + Rate(s, M_t, M_r, N2, N_i, P_T, x(N1+1: N1+N2), y(N1+1: N1+N2),...
-%                                             z(N1+1: N1+N2), x2, y2, z2, x_i, y_i, z_i, alpha_d, alpha_r, noise_power, 1);
-%         s=0;                           % s=0 : without IRS
-%         rate(1, 2, 2) = rate(1, 2, 2) + Rate(s,  M_t, M_r, N2, N_i, P_T, x(N1+1: N1+N2), y(N1+1: N1+N2),...
-%                                             z(N1+1: N1+N2), x2, y2, z2, x_i, y_i, z_i, alpha_d, alpha_r, noise_power, 1);
-%         rate(2, 1, 1) = rate(2, 1, 1) + Rate(s, M_t, M_r, N1, N_i, P_T, x(1: N1), y(1: N1),....
-%                                             z(1: N1), x1, y1, z1, x_i, y_i, z_i, alpha_d, alpha_r, noise_power, 1);
-%         rate(2, 2, 1) = rate(2, 1, 1);
-%         rate(2, 2, 2) = rate(1, 2, 2);
    end
    
         rate=rate/N_iter;
@@ -103,24 +86,13 @@ function [utility, rate]=PotentialGame(M_t, M_r, N1, N2, N_i, P_T, x, y, z, x1, 
         rate(:, :, 1)=N1*rate(:, :, 1);
         rate(:, :, 2)=N2*rate(:, :, 2);
 
-%         utility(1, 1, 1)=rate(1, 1, 1)-r*N_i/2;
-%         utility(1, 1, 2)=rate(1, 1, 2)-r*N_i/2;
-%         utility(1, 2, 1)=rate(1, 2, 1)-r*N_i;    
-%         utility(2, 1, 2)=rate(2, 1, 2)-r*N_i;
-% 
-%         utility(1, 2, 2)=rate(1, 2, 2);
-%         utility(2, 1, 1)=rate(2, 1, 1);
-% 
-%         utility(2, 2, 1)=utility(2, 1, 1);
-%         utility(2, 2, 2)=utility(1, 2, 2);
-%     for k=1:10
-%     for s1=1:N_i+1
-%     for s2=1:N_i+2-s1
-%     s1
-%     s2
-%     utility(s1 , s2, 1,k)=rate(s1 , s2, 1,k)-r*(s1-1);
-%     utility(s1 , s2, 2,k)=rate(s1 , s2, 2,k)-r*(s2-1);
-%     end
-%     end
-%     end
+    for s1=1:N_i*q_t+1
+           for s2=1:N_i*q_t-s1+1
+               N_i1=floor((s1-1)/q_t);     % No. of elements allocated to BS1
+               N_i2=floor((s2-1)/q_t);    % No. of elements allocated to BS2
+               utility(s1 , s2, 1)=rate(s1 , s2, 1)-r*N_i1;
+               utility(s1 , s2, 2)=rate(s1 , s2, 2)-r*N_i2;           
+           end            
+    end
+        
 end
