@@ -31,12 +31,6 @@
     % q_t                - Quantization step-size
 
 %
-%
-%
-%
-%
-%
-%
 % Outputs:
     % utility             - Utility function, 
     % rate                - Average acievable sumrate for each BS.
@@ -45,8 +39,8 @@
 
 function [utility, rate]=PotentialGame(M_t, M_r, N1, N2, N_i, P_T, x, y, z, x1, y1, z1,...
                 x2, y2, z2, x_i, y_i, z_i, alpha_d, alpha_r, noise_power, N_iter, R, r, q_t)
-   rate=zeros(ceil(N_i*q_t)+1,ceil(N_i*q_t)+1,2);
-   utility=zeros(ceil(N_i*q_t)+1,ceil(N_i*q_t)+1,2);
+   rate=zeros(ceil(1/q_t)+1,ceil(1/q_t)+1,2);
+   utility=zeros(ceil(1/q_t)+1,ceil(1/q_t)+1,2);
    x0= x;
    y0= y;
    
@@ -66,16 +60,25 @@ function [utility, rate]=PotentialGame(M_t, M_r, N1, N2, N_i, P_T, x, y, z, x1, 
 %         plot(x(3),y(3),'ro','linewidth',1)
 %         plot(x(4),y(4),'bo','linewidth',1)
 %         plot(x(5),y(5),'ro','linewidth',1)
+% 
+%     temp=Rate(M_t, M_r, N1, transpose(0:N_i*q_t:N_i), P_T, x(1:N1), y(1:N1), ...
+%         z(1:N1), x1, y1, z1, x_i, y_i, z_i, alpha_d, alpha_r, noise_power, 1);
+% 
+%         rate(s1 , 1:ceil(1/q_t)+2-s1, 1) + Rate(M_t, M_r, N1, transpose(0:N_i*q_t:N_i), P_T, x(1:N1), y(1:N1), ...
+%                                                 z(1:N1), x1, y1, z1, x_i, y_i, z_i, alpha_d, alpha_r, noise_power, 1);
 
-        for s1=1:N_i*q_t+1
-            N_i1=floor((s1-1)/q_t);     % No. of elements allocated to BS1
-            rate(s1 , 1:N_i*q_t-s1+1, 1) = rate(s1 , 1:N_i*q_t-s1+1, 1) + Rate(ceil(N_i1/N_i), M_t, M_r, N1, N_i1, P_T, x(1:N1), y(1:N1), ...
-                                                z(1:N1), x1, y1, z1, x_i, y_i, z_i, alpha_d, alpha_r, noise_power, 1);
-           for s2=1:N_i*q_t-s1+1
-               
-                N_i2=floor((s2-1)/q_t);    % No. of elements allocated to BS2
-                rate(s1 , s2, 2) = rate(s1 , s2, 2) + Rate(ceil(N_i2/N_i), M_t, M_r, N2, N_i2, P_T, x(N1+1: N1+N2), y(N1+1: N1+N2), ...
-                                                    z(N1+1: N1+N2), x2, y2, z2, x_i, y_i, z_i, alpha_d, alpha_r, noise_power, 1);                          
+        for s1=1:ceil(1/q_t)+1
+            N_i1=floor((s1-1)*N_i*q_t);     % No. of elements allocated to BS1
+            rate(s1 , 1:ceil(1/q_t)+2-s1, 1) = rate(s1 , 1:ceil(1/q_t)+2-s1, 1) +...
+                                            Rate( M_t, M_r, N1, N_i1,...
+                                            P_T, x(1:N1), y(1:N1), z(1:N1), x1, y1,...
+                                            z1, x_i, y_i, z_i, alpha_d, alpha_r, noise_power, 1);
+           for s2=1:ceil(1/q_t)+1-s1
+                N_i2=floor((s2-1)*N_i*q_t);    % No. of elements allocated to BS2
+                rate(s1 , s2, 2) = rate(s1 , s2, 2) + ...
+                                    Rate(M_t, M_r, N2, N_i2, P_T,...
+                                    x(N1+1: N1+N2), y(N1+1: N1+N2),z(N1+1: N1+N2),...
+                                    x2, y2, z2, x_i, y_i, z_i, alpha_d, alpha_r, noise_power, 1);                          
            end            
         end
         
@@ -86,13 +89,22 @@ function [utility, rate]=PotentialGame(M_t, M_r, N1, N2, N_i, P_T, x, y, z, x1, 
         rate(:, :, 1)=N1*rate(:, :, 1);
         rate(:, :, 2)=N2*rate(:, :, 2);
 
-    for s1=1:N_i*q_t+1
-           for s2=1:N_i*q_t-s1+1
-               N_i1=floor((s1-1)/q_t);     % No. of elements allocated to BS1
-               N_i2=floor((s2-1)/q_t);    % No. of elements allocated to BS2
+        for s1=1:ceil(1/q_t)+1
+           for s2=1:ceil(1/q_t)+1
+                N_i1=floor((s1-1)*N_i*q_t);    
+                N_i2=floor((s2-1)*N_i*q_t);    % No. of elements allocated to BS2
                utility(s1 , s2, 1)=rate(s1 , s2, 1)-r*N_i1;
-               utility(s1 , s2, 2)=rate(s1 , s2, 2)-r*N_i2;           
+               utility(s1 , s2, 2)=rate(s1 , s2, 2)-r*N_i2;
            end            
-    end
+        end
+        
+%     for s1=1:N_i*q_t+1
+%            for s2=1:N_i*q_t-s1+1
+%                N_i1=floor((s1-1)/q_t);     % No. of elements allocated to BS1
+%                N_i2=floor((s2-1)/q_t);    % No. of elements allocated to BS2
+%                utility(s1 , s2, 1)=rate(s1 , s2, 1)-r*N_i1;
+%                utility(s1 , s2, 2)=rate(s1 , s2, 2)-r*N_i2;           
+%            end            
+%     end
         
 end

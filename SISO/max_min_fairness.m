@@ -3,7 +3,7 @@ close all
 %% parameters
 N1=5;                           % No.  users
 N_i=10;                         % No.  IRS elements
-N_iter=100;                     % No. iteraions
+N_iter=2;                     % No. iteraions
 P_T=(10^(40/10))*1e-3;               % BS power(w)
 R=3;                           % Radius
 [x0,y0,z0]=deal(10,10,0);         % user area center

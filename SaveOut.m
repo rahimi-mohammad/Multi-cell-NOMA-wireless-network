@@ -1,4 +1,15 @@
-    function Y= SaveOut(file_name,new)
+% ------------------------------------------------------------------------ 
+%  mrahimi7755 - Sharif University of Technology, Iran
+% ------------------------------------------------------------------------
+% Rate.m - This method saves the the given input variable into file_name
+% .mat file
+% Inputs:
+    %file_name           - Name of the existing file to which you want to add your data ,
+    % new                - The variable you want to write in the first file.
+% Outputs:
+% ------------------------------------------------------------------------    
+
+function []= SaveOut(file_name,new)
 %         file_name = 'SaveBest.mat';                                     % Name File
 %         if strcmp(flag,'iter')
 %             ibest = state.Best(end);
