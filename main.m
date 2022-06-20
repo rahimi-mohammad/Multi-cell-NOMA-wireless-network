@@ -90,7 +90,7 @@ for i=1:SV
     SaveOut('utility.mat',utility(:,:,:,i));
     F=sum(utility(:,:,:,i),3);
     maximum = max(max(F));
-    [s1_star,s2_star]=find(F==maximum)
+    [s1_star,s2_star]=find(F==maximum);
     NE_final_rate( :, i)=rate(s1_star,s2_star,:,i);
     NE_final_utility( :, i)=utility(s1_star,s2_star,:,i);
 end

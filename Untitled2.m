@@ -31,7 +31,7 @@ xlabel('x')
 ylabel('y')
 xlim([-5 150]);
 ylim([-5 50]);
-legend('BS1','BS2','UE1','UE2','UE1','UE2','IRS');
+legend('BS1','BS2','IRS','UE1','UE2','UE1','UE2');
 grid on
 % draw results
 nexttile
@@ -86,7 +86,7 @@ xlabel('x')
 ylabel('y')
 xlim([-5 150]);
 ylim([-5 50]);
-legend('BS1','BS2','UE1','UE2','UE1','UE2','IRS');
+legend('BS1','BS2','IRS','UE1','UE2','UE1','UE2');
 grid on
 nexttile
 % draw results

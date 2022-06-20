@@ -17,8 +17,9 @@
 % Outputs:
     % U                  - Acheivable Rate of the BS(the lower bound).
 % ------------------------------------------------------------------------
-function rate=Rate(M_t, M_r, N1, N_i, P_T, x, y, z, x1, y1, z1,...
-                    x_i, y_i, z_i, alpha_d, alpha_r, noise_power, N_iter)
+function [rate]=Rate(M_t, M_r, N1, N_i, P_T, x, y, z, x1, y1, z1,...
+                    x_i, y_i, z_i, alpha_d, alpha_r, noise_power,...
+                    N_iter)
     
         rate=zeros(size(N_i,1),1);
     if size(N_i,1)>1
