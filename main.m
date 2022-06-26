@@ -62,7 +62,7 @@ for d=start+0*step:step:start+(SV-1)*step
     m(1+floor((d-start)/step))='|';
     disp(m)
     pause(1)
-    y(1:2)=d;
+    y(1:N1)=d;
     
     i=1+floor((d-start)/step);
    [~, rate(:, :, :, i)]=PotentialGame(M_t, M_r, N1, N2, N_i, P_T, x, y, z, x1, y1, z1,...
