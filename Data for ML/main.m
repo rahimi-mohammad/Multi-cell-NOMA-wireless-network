@@ -1,52 +1,46 @@
+%% NE
 % ------------------------------------------------------------------------ 
 %  mrahimi7755 - Sharif University of Technology, Iran
 % ------------------------------------------------------------------------
-% Rate.m - This method calculates aceivable rate of the BS's users for each
-% strategy
-% Inputs:
-    % N1                 - No.  users of BS1,
-    % N_i                - No.  IRS elements(It can be a vector),
-    % P_T                - BS power,
-    % x,y,z              - Users location,
-    % x1,y1,z1           - BS location,   
-    % x_i,y_i,z_i        - IRS location,      
-    % alpha_d            - BS to user pathloss
-    % alpha_r            - BS to IRS pathloss
-    % noise_power        - Noise power
-    % N_iter             - No. iteraions
-% Outputs:
-    % U                  - Acheivable Rate of the BS(the lower bound).
-% ------------------------------------------------------------------------
-function rate=Rate(M_t, M_r, N1, N_i, P_T, x, y, z, x1, y1, z1,...
-                    x_i, y_i, z_i, alpha_d, alpha_r, noise_power, N_iter)
-    
-        rate=zeros(size(N_i,1),1);
-    if size(N_i,1)>1
-        for j=1:size(N_i,1)
-        rate(j)=Rate(M_t, M_r, N1, N_i(j), P_T, x, y, z, x1, y1, z1,...
-            x_i, y_i, z_i, alpha_d, alpha_r, noise_power, N_iter);
-        end
-    else
-    %% parameters
-
-    channel_gain=zeros(N1,1);
-    end
+% main.m 
+% This script generates data for train and test of a ML model for solving
+% our Optimization problem
+tic
+%% parameters
+N_data=3;
+N1=5;                           % No.  users
+N_i=10;                         % No.  IRS elements
+% N_iter=100;                     % No. iteraions
+P_T=(10^(40/10))*1e-3;               % BS power(w)
+R=10;                           % Radius
+[x0,y0,z0]=deal(10,10,0);         % user area center
+[x1,y1,z1]=deal(0,0,10);       % BS1 location
+[x_i,y_i,z_i]=deal(25*sqrt(2),25*sqrt(2),10);   % IRS location
+M_t=1;                          % No. of transmitter antennas
+M_r=1;                          % No. of receiver antennas
+alpha_d=3.6;
+alpha_r=2;
+noise_power=(10^(-114/10));     % -169dbm/Hz
+%% users location
+t=2*pi*rand(N1,1);
+r = R*sqrt(rand(N1,1));
+x = x0 + r.*cos(t);
+y = y0 + r.*sin(t);
+z=1.5*ones(N1,1);
+filename = 'testdata.xlsx';
+xlRange='A1';
+for j=1:N_data
+    [h_d, G, h_r]=ChannelGain(M_t, M_r, N1, N, x, y, z, x1, y1, z1,...
+                                    x_i, y_i, z_i, alpha_d, alpha_r);
+     Data=[transpose(h_d); G; reshape(h_r,[],1)]; 
     final_rate=0;
     N=N_i;
     
     if N_i==0
         % without IRS
-            for k=1:N_iter
-                %% channel gains
-                [h_d, ~, ~]=ChannelGain(M_t, M_r, N1, N, x, y, z, x1, y1, z1,...
-                                        x_i, y_i, z_i, alpha_d, alpha_r);               
                 if M_t==1
                     %% without IRS
                     h_d=sort(abs(h_d));
-%                     p = 10^10*[P_T*abs(h_d(1)*h_d(2))^2, noise_power*(h_d'*h_d), -noise_power*abs(h_d(1))^2];
-%                     r = roots(p);
-%                     alpha=r(0<r&r<1); 
-%                 h_d=sort(abs(h_d));
                 final_rate=log2(1+P_T*h_d(1)^2/noise_power)/N1+final_rate; 
 %                     final_rate=(1/N1)*(log2((abs(h_d(1))^2*P_T+noise_power)/(abs(h_d(1))^2*P_T*alpha+noise_power))+log2((abs(h_d(2))^2*alpha*P_T+noise_power)/noise_power))+final_rate;         
                 elseif M_t>1
@@ -54,17 +48,10 @@ function rate=Rate(M_t, M_r, N1, N_i, P_T, x, y, z, x1, y1, z1,...
                     [h_d, ~, ~]=ChannelGain(M_t, M_r, N1, N, x, y, z, x1, y1, z1,...
                                             x_i, y_i, z_i, alpha_d, alpha_r);      
                 end 
-                
-            end
-            final_rate=final_rate/N_iter;
     else
         % with IRS
             
             if M_t==1
-                for k=1:N_iter
-                    %% channel gains
-                    [h_d, g, h_r]=ChannelGain(M_t, M_r, N1, N, x, y, z, x1, y1, z1,...
-                                              x_i, y_i, z_i, alpha_d, alpha_r);
                     %% problem coefficients
                     phi=zeros(N,N1);
                     Q=zeros(N+1,N+1,N1);
@@ -92,12 +79,8 @@ function rate=Rate(M_t, M_r, N1, N_i, P_T, x, y, z, x1, y1, z1,...
                     channel_gain=sort(abs(h_d+h_r'*diag(Z_cvx)*g));
                     rate_lower_bound=log2(1+P_T*channel_gain(1)^2/noise_power)/N1;
                     final_rate=final_rate+rate_lower_bound;
-                end
-                    final_rate=final_rate/N_iter;
             elseif M_t>1
                 % I will write this later
-                    [h_d, G, h_r]=ChannelGain(M_t, M_r, N1, N, x, y, z, x1, y1, z1,...
-                                              x_i, y_i, z_i, alpha_d, alpha_r);
                     %% problem coefficients
                     phi=zeros(N,N1);
                     Q=zeros(N+1,N+1,N1);
@@ -107,6 +90,22 @@ function rate=Rate(M_t, M_r, N1, N_i, P_T, x, y, z, x1, y1, z1,...
                     end
             end
     end
+    
     rate=final_rate;
-
+    xlRange=['A', num2str((j-1)*(N1+N_i+N1*N_i)+1)]
+    A = {...
+        num2cell(real(Data)), num2cell(imag(Data)),...
+        num2cell([angle(Z_cvx); zeros(N1+N_i+N1*N_i-N_i, 1) ]),...
+        num2cell([rate; zeros(N1+N_i+N1*N_i-1,1)])...
+    }
+    xlswrite(filename,A,sheet,xlRange)
 end
+
+
+
+
+
+
+
+
+

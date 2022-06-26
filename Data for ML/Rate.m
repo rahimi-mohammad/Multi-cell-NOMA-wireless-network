@@ -64,7 +64,7 @@ function rate=Rate(s, M_t, M_r, N1, N_i, P_T, x, y, z, x1, y1, z1,...
 
                     %% problem solver
                     Q=10^13*Q;
-                    cvx_begin sdp quiet
+                    cvx_begin sdp
                         variable X(N+1,N+1) complex hermitian  ;
                         variable s(1,1)     complex hermitian  ;
                         maximize s

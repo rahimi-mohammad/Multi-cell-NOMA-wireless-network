@@ -21,7 +21,7 @@ tic
     R1=10;                                % BS1 user area center radius
     R2=10;                                % BS2 user area center radius    
     N_i=30;                              % No.  IRS elements
-    N_iter=100;
+    N_iter=1;
     SV=5;
     P_T=(10^(40/10))*1e-3;               % BS power
 %     [x0,y0,z0]=deal(50,20,0);            % user area center
@@ -90,7 +90,7 @@ tic
         utilityG(2, 2, 1,i)=utilityG(2, 1, 1,i)-r*N_i/2;
         utilityG(2, 2, 2,i)=utilityG(1, 2, 2,i)-r*N_i/2;        
         P(:,i)=NE(utilityG(:, :, :, i));
-        NE_final_rateG( :, i) = P( 1, i) * P( 2, i) * rateG(1 ,1 ,:, i) +...
+        NE_final_rateG( :, i) = P( 1, i) * P( 2, i) * rateG(2 ,2 ,:, i) +...
                                 P( 1, i) * ( 1 - P(2, i)) * rateG( 1, 2,:, i) + ...
                                 (1 - P( 1, i) ) * P( 2, i) * rateG( 2, 1, :, i) + ...
                                 ( 1 - P( 1, i) ) * (1 - P( 2, i) ) * rateG( 2, 2, :, i); 
