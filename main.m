@@ -11,9 +11,9 @@ N1=10;                                % No. first Basestations users
 N2=5;                                 % No. first Basestations users
 R1=10;                                % BS1 user area center radius
 R2=10;                                % BS2 user area center radius    
-N_i=30;                               % No.  IRS elements
+N_i=6;                               % No.  IRS elements
 q_t=1/6;                              % Quantization step-size
-N_iter=200;
+N_iter=1;
 SV=5;                                 % Scenario Variable
 P_T=(10^(40/10))*1e-3;                % BS power
 % [x0,y0,z0]=deal(50,20,0);             % user area center
@@ -58,7 +58,7 @@ start=8;
 m=repmat('.', 1, 1+floor((y_i-start)/step));
 
 for d=start+0*step:step:start+(SV-1)*step
-    clc
+    
     m(1+floor((d-start)/step))='|';
     disp(m)
     pause(1)
@@ -87,14 +87,13 @@ for i=1:SV
        utility(s1,s2,2,i)=rate(s1,s2,2,i)-N_i2*r;
        end            
     end
-    SaveOut('utility.mat',utility(:,:,:,i));
-    F=sum(utility(:,:,:,i),3);
+%     SaveOut('utility.mat',utility(:,:,:,i));
+    F=sum(utility(:,:,:,i),3)
     maximum = max(max(F));
-    [s1_star,s2_star]=find(F==maximum);
+    [s1_star,s2_star]=find(F==maximum)
     NE_final_rate( :, i)=rate(s1_star,s2_star,:,i);
     NE_final_utility( :, i)=utility(s1_star,s2_star,:,i);
 end
-
 toc
 %% plot 1 SumRate
 figure
@@ -113,15 +112,10 @@ plot(x2,y2,'^','MarkerSize',10,...
 % draw IRS
 plot(x_i,y_i,'gs','MarkerSize',30,'linewidth',1)
 % draw BS1 users
-plot((x(1)+x(2))/2,start,'o-','MarkerSize',60*R1/10,'linewidth',0.1)
-plot((x(1)+x(2))/2,d,'o-','MarkerSize',60*R1/10,'linewidth',0.1)
-plot((x(1)+x(2))/2,start,'o-','MarkerSize',60*R1/10,'linewidth',0.1)
-plot((x(1)+x(2))/2,d,'o-','MarkerSize',60*R1/10,'linewidth',0.1)
-%     plot(x(1),y(1),'ro','linewidth',1)
-%     plot(x(2),y(2),'bo','linewidth',1)
-
+plot(x(1),start,'o-','MarkerSize',60*R1/10,'linewidth',0.1)
+plot(x(1),d,'o-','MarkerSize',60*R1/10,'linewidth',0.1)
 % draw BS2 users
-plot((x(4)+x(5))/2,start,'o-','MarkerSize',60*R1/10,'linewidth',0.1)
+plot(x(N1+1),start,'o-','MarkerSize',60*R1/10,'linewidth',0.1)
 %     plot(x(4),y(4),'bo','linewidth',1)
 % configs
 title('User Location')

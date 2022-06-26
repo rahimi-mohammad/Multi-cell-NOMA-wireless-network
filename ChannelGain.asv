@@ -15,9 +15,9 @@
     % alpha_r            - BS to IRS pathloss.
     % noise_power            
 % Outputs:
-    % h_d                - BS to users channel gain(N1*M_t*M_r),
+    % h_d                - BS to users channel gain,
     % G                  - BS to IRS channel gain,
-    % h_r                - IRS to users channel gain(N*N1).    
+    % h_r                - IRS to users channel gain().    
 % ------------------------------------------------------------------------
 function [h_d, G, h_r]=ChannelGain(M_t, M_r, N1, N, x, y, z, x1, y1, z1,...
                                     x_i, y_i, z_i, alpha_d, alpha_r)

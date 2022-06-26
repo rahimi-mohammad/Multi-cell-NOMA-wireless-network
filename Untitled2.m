@@ -14,16 +14,15 @@ plot(x2,y2,'^','MarkerSize',10,...
     'MarkerFaceColor','r','linewidth',1)
 % draw IRS
 plot(x_i,y_i,'gs','MarkerSize',30,'linewidth',1)
+legend('BS1','BS2','IRS');
 % draw BS1 users
-plot((x(1)+x(2))/2,start,'o-','MarkerSize',60*R1/10,'linewidth',0.1)
-plot((x(1)+x(2))/2,d,'o-','MarkerSize',60*R1/10,'linewidth',0.1)
 plot((x(1)+x(2))/2,start,'o-','MarkerSize',60*R1/10,'linewidth',0.1)
 plot((x(1)+x(2))/2,d,'o-','MarkerSize',60*R1/10,'linewidth',0.1)
 %     plot(x(1),y(1),'ro','linewidth',1)
 %     plot(x(2),y(2),'bo','linewidth',1)
 
 % draw BS2 users
-plot((x(4)+x(5))/2,start,'o-','MarkerSize',60*R1/10,'linewidth',0.1)
+plot((x(N1+1)+x(5))/2,start,'o-','MarkerSize',60*R1/10,'linewidth',0.1)
 %     plot(x(4),y(4),'bo','linewidth',1)
 % configs
 title('User Location')
