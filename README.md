@@ -1,2 +1,2 @@
-# RIS Sharing Scenarion
+# RIS Sharing Scenario
  
