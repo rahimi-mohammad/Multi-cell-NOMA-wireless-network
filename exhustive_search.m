@@ -1,4 +1,5 @@
-
+% This script calculates the solution of the max min problem by exhastive
+% search and compares it to the soltion provided by SVD method.
 %% freeze
         % N1=2;   % No. of users
         % N=2;   % No. of IRS elements

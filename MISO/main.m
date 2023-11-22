@@ -14,7 +14,7 @@ R1 = 10 ;                                % BS1 user area center radius
 R2 = 10 ;                                % BS2 user area center radius    
 N_i = 24 ;                                % No.  IRS elements
 q_t = 1/8 ;                              % Quantization step-size
-N_iter = 20 ;
+N_iter = 1 ;
 SV = 2 ;                                  % Scenario Variable
 P_T = (10^(40/10)) * 1e-3 ;                 % BS power
 % [x0 , y0 , z0] = deal(50 , 20 , 0) ;              % user area center
@@ -49,7 +49,7 @@ save('rate.mat' , 'var')
 save('loopcounter.mat' , 'var') 
 Random_final_rate = zeros(2 , SV) ; 
 Random_final_utility = zeros(2 , SV) ; 
-step = 5 ;     
+step = 5 ;        
 start = 8 ;   
 m = repmat('.' ,  1 ,  1 + floor((y_i-start)/step)) ; 
 tic
@@ -82,16 +82,16 @@ EPG_final_rate = zeros(2 , SV) ;
 EPG_final_utility= zeros(2 , SV) ;
 
 for i = 1 : SV
-    utility(1 , 1 , 1 ,i) = rate(1  , 1 , 1 ,i) ; 
-    utility(1 , 1 , 2 ,i) = rate(1 , 1 , 2 ,i) ; 
-    utility(1 , 2 , 1 ,i) = rate(1 , end , 1 ,i) ;     
-    utility(2 , 1 , 2 ,i) = rate(end , 1 , 2 ,i) ; 
+    utility(1 , 1 , 1 ,i) = N1 * rate(1  , 1 , 1 ,i) ; 
+    utility(1 , 1 , 2 ,i) = N2 * rate(1 , 1 , 2 ,i) ; 
+    utility(1 , 2 , 1 ,i) = N1 * rate(1 , end , 1 ,i) ;     
+    utility(2 , 1 , 2 ,i) = N2 * rate(end , 1 , 2 ,i) ; 
 
-    utility(1 , 2 , 2 ,i) = rate(1 , end , 2 ,i)-r * N_i ; 
-    utility(2 , 1 , 1 ,i) = rate(end , 1 , 1 ,i)-r * N_i ; 
+    utility(1 , 2 , 2 ,i) = N2 * rate(1 , end , 2 ,i)-r * N_i ; 
+    utility(2 , 1 , 1 ,i) = N1 * rate(end , 1 , 1 ,i)-r * N_i ; 
 
-    utility(2 , 2 , 1 ,i) = rate(1 + floor(size(rate , 1)/2) ,1 + floor(size(rate , 2)/2) , 1 ,i)-r * N_i/2 ; 
-    utility(2 , 2 , 2 ,i) = rate(1 + floor(size(rate , 1)/2) ,1 + floor(size(rate , 2)/2) , 2 ,i)-r * N_i/2 ;        
+    utility(2 , 2 , 1 ,i) = N1 * rate(1 + floor(size(rate , 1)/2) ,1 + floor(size(rate , 2)/2) , 1 ,i)-r * N_i/2 ; 
+    utility(2 , 2 , 2 ,i) = N2 * rate(1 + floor(size(rate , 1)/2) ,1 + floor(size(rate , 2)/2) , 2 ,i)-r * N_i/2 ;        
     P( :  ,i) = NE(utility( :  , : ,  :  , i)) ;
     NE_final_rate(  :  , i) = P( 1 , i) * P( 2 , i) * rate(1  ,1  , :  , i) +...
                             P( 1 , i) * ( 1 - P(2 , i)) * rate( 1 , end , :  , i) + ...
@@ -112,8 +112,8 @@ for i = 1 : SV
        for s2 = 1 : ceil(1/q_t)+1
            N_i1 = floor((s1-1) * N_i * q_t) ;     % No. of elements allocated to BS1
            N_i2 = floor((s2-1) * N_i * q_t) ;     % No. of elements allocated to BS2
-           EPG_utility(s1 , s2 , 1 , i) = rate(s1 , s2 , 1 , i)-N_i1 * r ; 
-           EPG_utility(s1 , s2 , 2 , i) = rate(s1 , s2 , 2 , i)-N_i2 * r ; 
+           EPG_utility(s1 , s2 , 1 , i) = N1 * rate(s1 , s2 , 1 , i)-N_i1 * r ; 
+           EPG_utility(s1 , s2 , 2 , i) = N2 * rate(s1 , s2 , 2 , i)-N_i2 * r ; 
        end            
     end
     %     SaveOut('EPG_utility.mat' , EPG_utility( :  ,  : , : ,i)) ; 
@@ -226,7 +226,8 @@ plot(start : step : (SV-1) * step+start , NE_final_utility(2 , 1 : i) , 'r-o' , 
 legend('BS1 EPG' , 'BS2 EPG' ,  'BS1 NE' ,  'BS2 NE') ; 
 % legend('BS1 EPG' , 'BS1 RANDOM'...
 %      , 'BS2 EPG' , 'BS2 RANDOM') ; 
-% configs
+% configs 
+
 grid on
 set(gcf , 'color' , 'w');   % Set the figure background to white
 title(['N = ' , num2str(N_i) , ' , r = ' , num2str(r) ])

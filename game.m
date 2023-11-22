@@ -3,14 +3,6 @@
 % ------------------------------------------------------------------------
 % game.m - This method returns the game table containing the utility function of the BS for each
 %  strategy.
-%                           Game Table:
-%  ____________________________________________________________________
-% |      W                                    |   W/O                  |
-% |___________________________________________|________________________|
-% |  W |    u(1,1,1),u(1,1,2)                 |    u(1,2,1),u(1,2,2)   |
-% | W/O|    u(2,1,1),u(2,1,2)                 |    u(2,2,1),u(2,2,2)   |
-% |____|______________________________________|________________________|
-%-------------------------------------------------------------------------
 % Inputs:
     % N1                 - No.  users of BS1,
     % N_i                - No.  IRS elements,
@@ -32,15 +24,15 @@
 %
 % Outputs:
     % utility                  - Utility function, 
-    % rate                     - Average acievable sumrate for each BS.
+    % rate               - Average acievable rate for each BS.
 % ------------------------------------------------------------------------
 
 
 function [utility, rate]=game(M_t, M_r, N1, N2, N_i, P_T, x, y, z, x1, y1, z1,...
                 x2, y2, z2, x_i, y_i, z_i, alpha_d, alpha_r, noise_power, N_iter, R, r)
-   rate=zeros(2,2,2);
-   x0= x;
-   y0= y;
+   rate = zeros(2,2,2);
+   x0=x;
+   y0 = y;
    
    for j=1:N_iter
         s=1;                            % s=1 : with IRS
@@ -59,35 +51,35 @@ function [utility, rate]=game(M_t, M_r, N1, N2, N_i, P_T, x, y, z, x1, y1, z1,..
         plot(x(4),y(4),'bo','linewidth',1)
         plot(x(5),y(5),'ro','linewidth',1)
 
+
+        rate(2, 2, 1) = rate(2, 2, 1) + Rate(s, M_t, M_r, N1, N_i/2, P_T, x(1: N1), y(1: N1),...
+                                            z(1: N1), x1, y1, z1, x_i, y_i, z_i, alpha_d, alpha_r, noise_power, 1);
+        rate(2, 2, 2) = rate(2, 2, 2) + Rate(s,  M_t, M_r, N2, N_i/2, P_T, x(N1+1: N1+N2), y(N1+1: N1+N2),...
+                                            z(N1+1: N1+N2), x2, y2, z2, x_i, y_i, z_i, alpha_d, alpha_r, noise_power, 1);
+        rate(1, 2, 2) = rate(1, 2, 2) + Rate(s, M_t, M_r, N2, N_i, P_T, x(N1+1: N1+N2), y(N1+1: N1+N2),...
+            z(N1+1: N1+N2), x2, y2, z2, x_i, y_i, z_i, alpha_d, alpha_r, noise_power, 1);    
+        
+       
+        rate(2, 1, 1) = rate(2, 1, 1) + Rate(s, M_t, M_r, N1, N_i, P_T, x(1: N1), y(1: N1),....
+                                            z(1: N1), x1, y1, z1, x_i, y_i, z_i, alpha_d, alpha_r, noise_power, 1);
+        s=0;                           % s=0 : without IRS
         rate(1 , 1, 1) = rate(1, 1, 1) + Rate(s, M_t, M_r, N1, N_i/2, P_T, x(1:N1), y(1:N1), ...
                                             z(1:N1), x1, y1, z1, x_i, y_i, z_i, alpha_d, alpha_r, noise_power, 1);
         rate(1, 1, 2) = rate(1, 1, 2) + Rate(s, M_t, M_r, N2, N_i/2, P_T, x(N1+1: N1+N2), y(N1+1: N1+N2), ...
                                             z(N1+1: N1+N2), x2, y2, z2, x_i, y_i, z_i, alpha_d, alpha_r, noise_power, 1);
-        rate(1, 2, 1) = rate(1, 2, 1) + Rate(s, M_t, M_r, N1, N_i, P_T, x(1: N1), y(1: N1),...
-                                            z(1: N1), x1, y1, z1, x_i, y_i, z_i, alpha_d, alpha_r, noise_power, 1);    
-        rate(2, 1, 2) = rate(1, 2, 1) + Rate(s, M_t, M_r, N2, N_i, P_T, x(N1+1: N1+N2), y(N1+1: N1+N2),...
-                                            z(N1+1: N1+N2), x2, y2, z2, x_i, y_i, z_i, alpha_d, alpha_r, noise_power, 1);
-        s=0;                           % s=0 : without IRS
-        rate(1, 2, 2) = rate(1, 2, 2) + Rate(s,  M_t, M_r, N2, N_i, P_T, x(N1+1: N1+N2), y(N1+1: N1+N2),...
-                                            z(N1+1: N1+N2), x2, y2, z2, x_i, y_i, z_i, alpha_d, alpha_r, noise_power, 1);
-        rate(2, 1, 1) = rate(2, 1, 1) + Rate(s, M_t, M_r, N1, N_i, P_T, x(1: N1), y(1: N1),....
-                                            z(1: N1), x1, y1, z1, x_i, y_i, z_i, alpha_d, alpha_r, noise_power, 1);
-        rate(2, 2, 1) = rate(2, 1, 1);
-        rate(2, 2, 2) = rate(1, 2, 2);
+        rate(1, 2, 1) = rate(1, 1, 1);
+        rate(2, 1, 2) = rate(1, 1, 2);
    end
    
         rate=rate/N_iter;
-        rate(:, :, 1)=N1*rate(:, :, 1);
-        rate(:, :, 2)=N2*rate(:, :, 2);
+        utility(1, 1, 1)=rate(1, 1, 1);
+        utility(1, 1, 2)=rate(1, 1, 2);
+        utility(1, 2, 1)=rate(1, 2, 1);    
+        utility(2, 1, 2)=rate(2, 1, 2);
 
-        utility(1, 1, 1)=rate(1, 1, 1)-r*N_i/2;
-        utility(1, 1, 2)=rate(1, 1, 2)-r*N_i/2;
-        utility(1, 2, 1)=rate(1, 2, 1)-r*N_i;    
-        utility(2, 1, 2)=rate(2, 1, 2)-r*N_i;
+        utility(1, 2, 2)=rate(1, 2, 2)-r*N_i;
+        utility(2, 1, 1)=rate(2, 1, 1)-r*N_i;
 
-        utility(1, 2, 2)=rate(1, 2, 2);
-        utility(2, 1, 1)=rate(2, 1, 1);
-
-        utility(2, 2, 1)=utility(2, 1, 1);
-        utility(2, 2, 2)=utility(1, 2, 2);
+        utility(2, 2, 1)=utility(2, 1, 1)-r*N_i/2;
+        utility(2, 2, 2)=utility(1, 2, 2)-r*N_i/2;        
 end
